@@ -1,0 +1,10 @@
+[
+  { "id": "g1", "url": "/images/chicken-biryani.jpg", "alt": "Signature Chicken Biryani", "category": "Food", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g2", "url": "/images/restaurant-ambience.jpg", "alt": "Restaurant Ambience", "category": "Ambience", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g3", "url": "/images/family-dining.jpg", "alt": "Family Dining Area", "category": "Ambience", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g4", "url": "/images/mutton-biryani.jpg", "alt": "Mutton Biryani", "category": "Food", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g5", "url": "/images/paneer-butter-masala.jpg", "alt": "Paneer Butter Masala", "category": "Food", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g6", "url": "/images/manchurian.jpg", "alt": "Gobi Manchurian", "category": "Food", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g7", "url": "/images/butter-naan.jpg", "alt": "Vegetarian Delights", "category": "Food", "createdAt": "2024-01-01T00:00:00.000Z" },
+  { "id": "g8", "url": "/images/fried-rice.jpg", "alt": "Wok Tossed Noodles", "category": "Food", "createdAt": "2024-01-01T00:00:00.000Z" }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "m1",
+    "name": "Chicken Biryani",
+    "description": "Fragrant basmati rice layered with tender chicken and aromatic spices",
+    "price": 250,
+    "category": "Biryani Specials",
+    "image": "/images/chicken-biryani.jpg",
+    "isPopular": true,
+    "isChefSpecial": true,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m2",
+    "name": "Mutton Biryani",
+    "description": "Succulent mutton pieces cooked with premium basmati rice",
+    "price": 350,
+    "category": "Biryani Specials",
+    "image": "/images/mutton-biryani.jpg",
+    "isPopular": true,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m3",
+    "name": "Gobi Manchurian",
+    "description": "Crispy cauliflower tossed in flavorful manchurian sauce",
+    "price": 180,
+    "category": "Starters",
+    "image": "/images/manchurian.jpg",
+    "isPopular": true,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m4",
+    "name": "Crispy Veg",
+    "description": "Crunchy vegetable fritters served with tangy dipping sauce",
+    "price": 160,
+    "category": "Starters",
+    "image": "/images/paneer-butter-masala.jpg",
+    "isPopular": false,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m5",
+    "name": "Chicken Manchurian",
+    "description": "Boneless chicken in spicy-sweet manchurian gravy",
+    "price": 220,
+    "category": "Indo-Chinese",
+    "image": "/images/manchurian.jpg",
+    "isPopular": true,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m6",
+    "name": "Fried Rice",
+    "description": "Wok-tossed rice with vegetables and aromatic seasonings",
+    "price": 190,
+    "category": "Indo-Chinese",
+    "image": "/images/fried-rice.jpg",
+    "isPopular": false,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m7",
+    "name": "Noodles",
+    "description": "Stir-fried noodles with fresh vegetables and sauces",
+    "price": 180,
+    "category": "Indo-Chinese",
+    "image": "/images/noodles.jpg",
+    "isPopular": false,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m8",
+    "name": "Paneer Butter Masala",
+    "description": "Rich and creamy paneer in tomato-based gravy",
+    "price": 240,
+    "category": "Main Course",
+    "image": "/images/paneer-butter-masala.jpg",
+    "isPopular": true,
+    "isChefSpecial": true,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m9",
+    "name": "Butter Naan",
+    "description": "Soft, buttery Indian bread baked in tandoor",
+    "price": 40,
+    "category": "Main Course",
+    "image": "/images/butter-naan.jpg",
+    "isPopular": false,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "m10",
+    "name": "Veg Bullet",
+    "description": "Spicy vegetable stuffed roll with signature seasoning",
+    "price": 150,
+    "category": "Vegetarian Specials",
+    "image": "/images/veg-curry.jpg",
+    "isPopular": false,
+    "isChefSpecial": false,
+    "isAvailable": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]
