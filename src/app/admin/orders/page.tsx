@@ -50,6 +50,9 @@ export default function AdminOrders() {
                     <span className="text-xs text-white/30">{order.customerMobile}</span>
                   </div>
                   <p className="text-xs text-white/40">Pickup: {new Date(order.pickupTime).toLocaleString()}</p>
+                  <span className="text-xs text-white/30 mt-1 block">
+                    Pay: {order.paymentMethod === 'upi' ? 'UPI/GPay' : 'Cash on Pickup'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[order.status]}`}>

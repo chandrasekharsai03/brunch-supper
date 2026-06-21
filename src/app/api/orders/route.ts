@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
       customerName: body.customerName,
       customerMobile: body.customerMobile,
       pickupTime: body.pickupTime,
+      paymentMethod: body.paymentMethod || 'cash',
       status: 'pending',
       createdAt: new Date().toISOString(),
     };

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, Plus, Minus, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Minus, CheckCircle, CreditCard, Banknote } from 'lucide-react';
 import Link from 'next/link';
 import type { MenuItem } from '@/types';
 import { formatPrice } from '@/lib/utils';
@@ -13,6 +13,7 @@ export default function PreOrderPage() {
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
   const [pickupTime, setPickupTime] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -61,6 +62,7 @@ export default function PreOrderPage() {
           customerName,
           customerMobile,
           pickupTime,
+          paymentMethod,
         }),
       });
       setSubmitted(true);
@@ -191,12 +193,46 @@ export default function PreOrderPage() {
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#FC8019] transition-colors"
                   />
                 </div>
+
+                <div>
+                  <label className="text-sm text-white/60 mb-2 block">Payment Method</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('cash')}
+                      className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all ${
+                        paymentMethod === 'cash' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'
+                      }`}
+                    >
+                      <Banknote size={16} />
+                      Cash on Pickup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('upi')}
+                      className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all ${
+                        paymentMethod === 'upi' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'
+                      }`}
+                    >
+                      <CreditCard size={16} />
+                      UPI / GPay
+                    </button>
+                  </div>
+                  {paymentMethod === 'upi' && (
+                    <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                      <p className="text-xs text-white/40 mb-1">Pay to UPI ID:</p>
+                      <p className="text-sm font-mono text-[#FC8019]">918912552021@paytm</p>
+                      <p className="text-xs text-white/30 mt-2">Pay at pickup counter or share payment screenshot via WhatsApp</p>
+                    </div>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   disabled={cartItems.length === 0 || loading}
                   className="w-full py-3 rounded-xl gradient-bg text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                 >
-                  {loading ? 'Placing Order...' : 'Place Order'}
+                  {loading ? 'Placing Order...' : `Place Order · ${formatPrice(totalAmount)}`}
                 </button>
               </form>
             </div>

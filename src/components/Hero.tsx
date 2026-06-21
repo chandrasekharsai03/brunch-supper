@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Star, Clock, MapPin, Phone, ArrowRight, ChefHat, Sparkles, Heart } from 'lucide-react';
+import { Star, Clock, MapPin, Phone, ArrowRight, ChefHat, Sparkles, Heart, ShoppingBag } from 'lucide-react';
+import Link from 'next/link';
 import { isOpenNow, getWhatsAppUrl, getDirectionsUrl, getCallUrl } from '@/lib/utils';
 
 export default function Hero() {
@@ -79,9 +80,16 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-wrap gap-3"
             >
+              <Link
+                href="/preorder"
+                className="gradient-bg px-6 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2 hover:shadow-lg hover:shadow-[#FC8019]/25 transition-all"
+              >
+                <ShoppingBag size={16} />
+                Order Now
+              </Link>
               <a
                 href="#menu"
-                className="gradient-bg px-6 py-3 rounded-full font-semibold text-sm inline-flex items-center gap-2 hover:shadow-lg hover:shadow-[#FC8019]/25 transition-all"
+                className="px-6 py-3 rounded-full font-semibold text-sm border border-white/30 hover:bg-white/5 transition-all inline-flex items-center gap-2"
               >
                 View Menu
                 <ArrowRight size={16} />

@@ -46,6 +46,7 @@ export interface PickupOrder {
   customerName: string;
   customerMobile: string;
   pickupTime: string;
+  paymentMethod?: string;
   status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled';
   createdAt: string;
 }

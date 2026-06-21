@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS orders (
   "customerName" TEXT NOT NULL,
   "customerMobile" TEXT NOT NULL,
   "pickupTime" TEXT NOT NULL,
+  "paymentMethod" TEXT DEFAULT 'cash',
   status TEXT NOT NULL DEFAULT 'pending',
   "createdAt" TEXT NOT NULL
 );

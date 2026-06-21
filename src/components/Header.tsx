@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { isOpenNow } from '@/lib/utils';
 
 const navLinks = [
+  { href: '/preorder', label: 'Order Now' },
   { href: '#menu', label: 'Menu' },
   { href: '#about', label: 'About' },
   { href: '#gallery', label: 'Gallery' },
