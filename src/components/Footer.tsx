@@ -46,6 +46,16 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/reservation" className="text-sm text-white/50 hover:text-white transition-colors">
+                  Reserve a Table
+                </Link>
+              </li>
+              <li>
+                <Link href="/track-order" className="text-sm text-white/50 hover:text-white transition-colors">
+                  Track Order
+                </Link>
+              </li>
+              <li>
                 <Link href="/loyalty" className="text-sm text-white/50 hover:text-white transition-colors">
                   Loyalty Program
                 </Link>
@@ -53,6 +63,11 @@ export default function Footer() {
               <li>
                 <Link href="/menu/qrcode" className="text-sm text-white/50 hover:text-white transition-colors">
                   QR Code Menu
+                </Link>
+              </li>
+              <li>
+                <Link href="/account" className="text-sm text-white/50 hover:text-white transition-colors">
+                  My Account
                 </Link>
               </li>
               <li>

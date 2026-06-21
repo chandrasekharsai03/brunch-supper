@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Plus, Minus, Trash2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Plus, Minus, Trash2, ArrowLeft, ArrowRight, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { getCart, updateQuantity, removeFromCart, getCartTotal, getCartCount, CartItem } from '@/lib/cart';
 import { formatPrice } from '@/lib/utils';
@@ -114,6 +114,16 @@ export default function CartPage() {
               >
                 Proceed to Checkout <ArrowRight size={16} />
               </Link>
+              <a
+                href={`https://wa.me/918912552021?text=${encodeURIComponent(
+                  `Hi! I'd like to order:\n\n${cart.map(i => `• ${i.name} × ${i.quantity} — ₹${(i.price * i.quantity).toFixed(0)}`).join('\n')}\n\nTotal: ₹${total.toFixed(0)}\n\nPlease confirm pickup time.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full mt-3 py-3 rounded-xl border border-[#25D366]/30 text-[#25D366] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#25D366]/10 transition-all"
+              >
+                <MessageCircle size={16} /> Order via WhatsApp
+              </a>
             </div>
           </>
         )}

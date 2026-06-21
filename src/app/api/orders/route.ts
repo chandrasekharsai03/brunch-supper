@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       customerMobile: body.customerMobile,
       pickupTime: body.pickupTime,
       paymentMethod: body.paymentMethod || 'cash',
+      paymentId: body.paymentId || '',
       status: 'pending',
       createdAt: new Date().toISOString(),
     };

@@ -51,7 +51,8 @@ export default function AdminOrders() {
                   </div>
                   <p className="text-xs text-white/40">Pickup: {new Date(order.pickupTime).toLocaleString()}</p>
                   <span className="text-xs text-white/30 mt-1 block">
-                    Pay: {order.paymentMethod === 'upi' ? 'UPI/GPay' : 'Cash on Pickup'}
+                    Pay: {order.paymentMethod === 'razorpay' ? 'Razorpay ✓' : order.paymentMethod === 'upi' ? 'UPI/GPay' : 'Cash on Pickup'}
+                    {order.paymentId && <span className="block font-mono text-[10px] text-white/20">{order.paymentId}</span>}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

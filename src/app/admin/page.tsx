@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { UtensilsCrossed, LogOut, Menu, Star, Users, MessageSquare, ShoppingBag, Image, Award, Send, TrendingUp, MessageCircle } from 'lucide-react';
+import { UtensilsCrossed, LogOut, Menu, Star, Users, MessageSquare, ShoppingBag, Image, Award, Send, TrendingUp, MessageCircle, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
 const stats = [
   { label: 'Menu Items', icon: Menu, color: '#FC8019', href: '/admin/menu' },
   { label: 'Today\'s Specials', icon: Star, color: '#D4AF37', href: '/admin/specials' },
+  { label: 'Reservations', icon: Calendar, color: '#06B6D4', href: '/admin/reservations' },
   { label: 'Customer Leads', icon: Users, color: '#3B82F6', href: '/admin/leads' },
   { label: 'Feedback', icon: MessageSquare, color: '#8B5CF6', href: '/admin/feedback' },
   { label: 'Pickup Orders', icon: ShoppingBag, color: '#10B981', href: '/admin/orders' },

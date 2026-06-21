@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS orders (
   "customerMobile" TEXT NOT NULL,
   "pickupTime" TEXT NOT NULL,
   "paymentMethod" TEXT DEFAULT 'cash',
+  "paymentId" TEXT DEFAULT '',
   status TEXT NOT NULL DEFAULT 'pending',
   "createdAt" TEXT NOT NULL
 );
@@ -89,5 +90,28 @@ CREATE TABLE IF NOT EXISTS contacts (
   date TEXT DEFAULT '',
   time TEXT DEFAULT '',
   guests TEXT DEFAULT '',
+  "createdAt" TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS customers (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  mobile TEXT NOT NULL UNIQUE,
+  email TEXT DEFAULT '',
+  password TEXT NOT NULL,
+  "createdAt" TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS reservations (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  mobile TEXT NOT NULL,
+  email TEXT DEFAULT '',
+  date TEXT NOT NULL,
+  time TEXT NOT NULL,
+  guests INTEGER NOT NULL DEFAULT 2,
+  occasion TEXT DEFAULT '',
+  notes TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending',
   "createdAt" TEXT NOT NULL
 );

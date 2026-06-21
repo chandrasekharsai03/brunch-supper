@@ -47,6 +47,7 @@ export interface PickupOrder {
   customerMobile: string;
   pickupTime: string;
   paymentMethod?: string;
+  paymentId?: string;
   status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled';
   createdAt: string;
 }
@@ -75,5 +76,28 @@ export interface GalleryImage {
   url: string;
   alt: string;
   category: string;
+  createdAt: string;
+}
+
+export interface Reservation {
+  id: string;
+  name: string;
+  mobile: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: number;
+  occasion?: string;
+  notes?: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  createdAt: string;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  mobile: string;
+  email: string;
+  password: string;
   createdAt: string;
 }

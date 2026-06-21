@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, MapPin, Clock, UtensilsCrossed, ShoppingBag } from 'lucide-react';
+import { Menu, X, Phone, MapPin, Clock, UtensilsCrossed, ShoppingBag, User } from 'lucide-react';
 import Link from 'next/link';
 import { isOpenNow } from '@/lib/utils';
 import { getCart, getCartCount } from '@/lib/cart';
 
 const navLinks = [
   { href: '/preorder', label: 'Order Now' },
+  { href: '/reservation', label: 'Reserve Table' },
+  { href: '/track-order', label: 'Track Order' },
   { href: '#menu', label: 'Menu' },
   { href: '#about', label: 'About' },
   { href: '#gallery', label: 'Gallery' },
-  { href: '#reviews', label: 'Reviews' },
   { href: '#location', label: 'Location' },
   { href: '#contact', label: 'Contact' },
 ];
@@ -74,6 +75,12 @@ export default function Header() {
 
           <div className="hidden lg:flex items-center gap-4">
             <Link
+              href="/account"
+              className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-all"
+            >
+              <User size={18} />
+            </Link>
+            <Link
               href="/cart"
               className="relative p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-all"
             >
@@ -126,6 +133,28 @@ export default function Header() {
                   {link.label}
                 </a>
               ))}
+              <div className="flex items-center gap-3 pt-2">
+                <Link
+                  href="/cart"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2 text-white/80 hover:text-white transition-colors py-2"
+                >
+                  <ShoppingBag size={18} />
+                  Cart
+                  {cartCount > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-[#FC8019] text-[10px] font-bold flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/account"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-white/80 hover:text-white transition-colors py-2"
+                >
+                  My Account
+                </Link>
+              </div>
               <div className="pt-4 border-t border-white/10 space-y-3">
                 <a
                   href="tel:+918912552021"

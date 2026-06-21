@@ -1,10 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ShoppingCart, CheckCircle, CreditCard, Banknote, Trash2 } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, CheckCircle, CreditCard, Banknote, Trash2, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { getCart, saveCart, clearCart, getCartTotal, getCartCount, CartItem } from '@/lib/cart';
+
+function loadRazorpay(): Promise<void> {
+  return new Promise((resolve) => {
+    if ((window as any).Razorpay) { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve();
+    document.body.appendChild(script);
+  });
+}
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -14,6 +24,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [paymentId, setPaymentId] = useState('');
 
   useEffect(() => {
     setCart(getCart());
@@ -36,23 +47,64 @@ export default function CheckoutPage() {
     window.dispatchEvent(new Event('cart-update'));
   };
 
+  const saveOrder = async (razorpayPaymentId?: string) => {
+    await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: cart.map(i => ({ menuItemId: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+        totalAmount,
+        customerName,
+        customerMobile,
+        pickupTime,
+        paymentMethod: razorpayPaymentId ? 'razorpay' : paymentMethod,
+        paymentId: razorpayPaymentId || '',
+      }),
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0 || !customerName || !customerMobile || !pickupTime) return;
+
+    if (paymentMethod === 'razorpay') {
+      setLoading(true);
+      try {
+        await loadRazorpay();
+        const res = await fetch('/api/payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'create-order', amount: totalAmount }),
+        });
+        const order = await res.json();
+        if (!res.ok) { alert(order.error || 'Payment setup failed'); setLoading(false); return; }
+
+        const rzp = new (window as any).Razorpay({
+          key: order.key,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'BRUNCH & SUPPER',
+          description: `Order for ${customerName}`,
+          prefill: { name: customerName, contact: customerMobile },
+          handler: async (response: any) => {
+            await saveOrder(response.razorpay_payment_id);
+            setPaymentId(response.razorpay_payment_id);
+            setSubmitted(true);
+            clearCart();
+            window.dispatchEvent(new Event('cart-update'));
+          },
+          modal: {
+            ondismiss: () => setLoading(false),
+          },
+        });
+        rzp.open();
+      } catch { alert('Payment failed. Please try again.'); setLoading(false); }
+      return;
+    }
+
     setLoading(true);
     try {
-      await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.map(i => ({ menuItemId: i.id, name: i.name, quantity: i.quantity, price: i.price })),
-          totalAmount,
-          customerName,
-          customerMobile,
-          pickupTime,
-          paymentMethod,
-        }),
-      });
+      await saveOrder();
       setSubmitted(true);
       clearCart();
       window.dispatchEvent(new Event('cart-update'));
@@ -68,10 +120,15 @@ export default function CheckoutPage() {
             <CheckCircle size={40} className="text-green-400" />
           </div>
           <h2 className="text-2xl font-bold mb-3">Order Placed!</h2>
-          <p className="text-white/50 mb-4">Your order has been received. We&apos;ll have it ready for pickup at {pickupTime}.</p>
-          <p className="text-sm text-white/40 mb-6">
-            Pay via {paymentMethod === 'upi' ? 'UPI (918912552021@paytm)' : 'Cash on Pickup'} at the counter
-          </p>
+          <p className="text-white/50 mb-2">Your order has been received. We&apos;ll have it ready for pickup at {pickupTime}.</p>
+          {paymentId && (
+            <p className="text-xs text-white/30 mb-4 font-mono">Payment ID: {paymentId}</p>
+          )}
+          {paymentMethod !== 'razorpay' && !paymentId && (
+            <p className="text-sm text-white/40 mb-6">
+              Pay via {paymentMethod === 'upi' ? 'UPI (918912552021@paytm)' : 'Cash on Pickup'} at the counter
+            </p>
+          )}
           <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 rounded-full gradient-bg text-sm font-semibold">
             Back to Home
           </Link>
@@ -162,14 +219,18 @@ export default function CheckoutPage() {
 
             <div>
               <label className="text-sm text-white/60 mb-2 block">Payment Method</label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button type="button" onClick={() => setPaymentMethod('cash')}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all ${paymentMethod === 'cash' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'}`}>
-                  <Banknote size={16} /> Cash on Pickup
+                  className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm transition-all ${paymentMethod === 'cash' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'}`}>
+                  <Banknote size={16} /> Cash
                 </button>
                 <button type="button" onClick={() => setPaymentMethod('upi')}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all ${paymentMethod === 'upi' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'}`}>
-                  <CreditCard size={16} /> UPI / GPay
+                  className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm transition-all ${paymentMethod === 'upi' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'}`}>
+                  <CreditCard size={16} /> UPI
+                </button>
+                <button type="button" onClick={() => setPaymentMethod('razorpay')}
+                  className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm transition-all ${paymentMethod === 'razorpay' ? 'bg-[#FC8019]/20 border border-[#FC8019]' : 'bg-white/5 border border-white/10'}`}>
+                  <Wallet size={16} /> Pay Online
                 </button>
               </div>
               {paymentMethod === 'upi' && (
@@ -179,11 +240,16 @@ export default function CheckoutPage() {
                   <p className="text-xs text-white/30 mt-2">Pay at counter or share screenshot via WhatsApp</p>
                 </div>
               )}
+              {paymentMethod === 'razorpay' && (
+                <div className="mt-3 p-3 rounded-xl bg-[#FC8019]/10 border border-[#FC8019]/20">
+                  <p className="text-xs text-white/60">Pay online via UPI, Cards, or NetBanking. You will be redirected to the Razorpay checkout.</p>
+                </div>
+              )}
             </div>
 
             <button type="submit" disabled={loading || !customerName || !customerMobile || !pickupTime}
               className="w-full py-3.5 rounded-xl gradient-bg text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50">
-              {loading ? 'Placing Order...' : `Place Order · ${formatPrice(totalAmount)}`}
+              {loading ? 'Processing...' : `Place Order · ${formatPrice(totalAmount)}`}
             </button>
           </form>
         </div>
