@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, Plus, Minus, CheckCircle, CreditCard, Banknote } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Minus, CheckCircle, CreditCard, Banknote, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { MenuItem } from '@/types';
 import { formatPrice } from '@/lib/utils';
+import { getCart, saveCart, clearCart, getCartTotal } from '@/lib/cart';
 
 export default function PreOrderPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -19,12 +20,24 @@ export default function PreOrderPage() {
 
   useEffect(() => {
     fetch('/api/menu').then(r => r.json()).then(data => {
-      if (data && data.length > 0) setItems(data.filter((i: MenuItem) => i.isAvailable));
+      if (data && data.length > 0) {
+        setItems(data.filter((i: MenuItem) => i.isAvailable));
+        const stored = getCart();
+        if (stored.length > 0) {
+          const mapped: { [key: string]: number } = {};
+          stored.forEach(si => { mapped[si.id] = si.quantity; });
+          setCart(mapped);
+        }
+      }
     }).catch(() => {});
   }, []);
 
   const addToCart = (id: string) => {
-    setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+    setCart(prev => {
+      const next = { ...prev, [id]: (prev[id] || 0) + 1 };
+      syncLocal(next);
+      return next;
+    });
   };
 
   const removeFromCart = (id: string) => {
@@ -32,16 +45,26 @@ export default function PreOrderPage() {
       const next = { ...prev };
       if (next[id] <= 1) delete next[id];
       else next[id]--;
+      syncLocal(next);
       return next;
     });
   };
+
+  function syncLocal(c: { [key: string]: number }) {
+    const stored = Object.entries(c).map(([id, qty]) => {
+      const item = items.find(i => i.id === id);
+      return item ? { id, name: item.name, price: item.price, image: item.image, quantity: qty } : null;
+    }).filter(Boolean) as any[];
+    saveCart(stored);
+    window.dispatchEvent(new Event('cart-update'));
+  }
 
   const cartItems = Object.entries(cart).map(([id, qty]) => {
     const item = items.find(i => i.id === id);
     return item ? { ...item, quantity: qty } : null;
   }).filter(Boolean);
 
-  const totalAmount = cartItems.reduce((sum, item: any) => sum + item.price * item.quantity, 0);
+  const totalAmount = cartItems.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +90,8 @@ export default function PreOrderPage() {
       });
       setSubmitted(true);
       setCart({});
+      clearCart();
+      window.dispatchEvent(new Event('cart-update'));
     } catch { /* ignore */ }
     setLoading(false);
   };
@@ -92,11 +117,28 @@ export default function PreOrderPage() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().slice(0, 16);
 
+  if (cartItems.length === 0 && items.length > 0) {
+    return (
+      <div className="min-h-screen bg-[#0B0B0B] pt-24">
+        <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
+            <ShoppingCart size={40} className="text-white/20" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+          <p className="text-white/40 mb-6">Add items from our menu to get started</p>
+          <Link href="/menu" className="inline-flex items-center gap-2 px-6 py-3 rounded-full gradient-bg text-sm font-semibold">
+            Browse Menu <ArrowRight size={16} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0B0B0B] pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white mb-8 transition-colors">
-          <ArrowLeft size={14} /> Back to Home
+        <Link href="/cart" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white mb-8 transition-colors">
+          <ArrowLeft size={14} /> Back to Cart
         </Link>
 
         <div className="grid lg:grid-cols-3 gap-8">

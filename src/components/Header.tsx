@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, MapPin, Clock, UtensilsCrossed } from 'lucide-react';
+import { Menu, X, Phone, MapPin, Clock, UtensilsCrossed, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { isOpenNow } from '@/lib/utils';
+import { getCart, getCartCount } from '@/lib/cart';
 
 const navLinks = [
   { href: '/preorder', label: 'Order Now' },
@@ -20,6 +21,18 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    setCartCount(getCartCount(getCart()));
+    const handler = () => setCartCount(getCartCount(getCart()));
+    window.addEventListener('storage', handler);
+    window.addEventListener('cart-update', handler);
+    return () => {
+      window.removeEventListener('storage', handler);
+      window.removeEventListener('cart-update', handler);
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -60,6 +73,17 @@ export default function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
+            <Link
+              href="/cart"
+              className="relative p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-all"
+            >
+              <ShoppingBag size={18} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#FC8019] text-[10px] font-bold flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs text-green-400 font-medium">

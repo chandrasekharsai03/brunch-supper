@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Search, TrendingUp, ChefHat, ArrowLeft } from 'lucide-react';
+import { Search, TrendingUp, ChefHat, ArrowLeft, ShoppingCart, Plus, Check } from 'lucide-react';
 import Link from 'next/link';
 import type { MenuItem } from '@/types';
 import { formatPrice } from '@/lib/utils';
+import { addToCart, getCart, getCartTotal, getCartCount } from '@/lib/cart';
 
 const fallbackMenu: MenuItem[] = [
   { id: '1', name: 'Chicken Biryani', description: 'Fragrant basmati rice layered with tender chicken and aromatic spices', price: 250, category: 'Biryani Specials', image: '/images/chicken-biryani.jpg', isPopular: true, isChefSpecial: true, isAvailable: true, createdAt: '' },
@@ -26,6 +27,7 @@ export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>(fallbackMenu);
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch('/api/menu').then(r => r.json()).then(data => {
@@ -117,14 +119,19 @@ export default function MenuPage() {
                   <p className="text-sm text-white/40 line-clamp-2 mb-3">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-xl font-bold gradient-text">{formatPrice(item.price)}</span>
-                    <a
-                      href={`https://wa.me/918912552021?text=${encodeURIComponent(`Hi! I want to order ${item.name} (${formatPrice(item.price)})`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs px-3 py-1.5 rounded-full bg-green-600 hover:bg-green-700 font-medium transition-all"
+                    <button
+                      onClick={() => {
+                        addToCart({ id: item.id, name: item.name, price: item.price, image: item.image });
+                        setAddedIds(prev => new Set(prev).add(item.id));
+                        window.dispatchEvent(new Event('cart-update'));
+                        setTimeout(() => setAddedIds(prev => { const n = new Set(prev); n.delete(item.id); return n; }), 1500);
+                      }}
+                      className={`text-xs px-3 py-1.5 rounded-full font-medium transition-all flex items-center gap-1.5 ${
+                        addedIds.has(item.id) ? 'bg-green-600 text-white' : 'bg-[#FC8019] hover:bg-[#FC8019]/80 text-white'
+                      }`}
                     >
-                      Order
-                    </a>
+                      {addedIds.has(item.id) ? <><Check size={12} /> Added</> : <><Plus size={12} /> Add</>}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -139,6 +146,46 @@ export default function MenuPage() {
           </div>
         )}
       </div>
+
+      <CartBar />
+    </div>
+  );
+}
+
+function CartBar() {
+  const [cart, setCart] = useState(getCart());
+  useEffect(() => {
+    const update = () => setCart(getCart());
+    window.addEventListener('cart-update', update);
+    window.addEventListener('storage', update);
+    return () => {
+      window.removeEventListener('cart-update', update);
+      window.removeEventListener('storage', update);
+    };
+  }, []);
+  if (cart.length === 0) return null;
+  const total = getCartTotal(cart);
+  const count = getCartCount(cart);
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-40 p-4">
+      <Link
+        href="/cart"
+        className="max-w-lg mx-auto glass-card rounded-2xl p-4 flex items-center justify-between shadow-2xl border border-[#FC8019]/20"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#FC8019] flex items-center justify-center">
+            <ShoppingCart size={18} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">{count} item{count > 1 ? 's' : ''} in cart</p>
+            <p className="text-xs text-white/40">Tap to view & checkout</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold gradient-text">{formatPrice(total)}</span>
+          <span className="text-xs px-3 py-1.5 rounded-full gradient-bg">View Cart</span>
+        </div>
+      </Link>
     </div>
   );
 }
