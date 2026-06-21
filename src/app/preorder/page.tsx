@@ -6,10 +6,23 @@ import { ArrowLeft, ShoppingCart, Plus, Minus, CheckCircle, CreditCard, Banknote
 import Link from 'next/link';
 import type { MenuItem } from '@/types';
 import { formatPrice } from '@/lib/utils';
-import { getCart, saveCart, clearCart, getCartTotal } from '@/lib/cart';
+import { getCart, saveCart, clearCart } from '@/lib/cart';
+
+const fallbackMenu: MenuItem[] = [
+  { id: 'm1', name: 'Chicken Biryani', description: 'Fragrant basmati rice layered with tender chicken and aromatic spices', price: 250, category: 'Biryani Specials', image: '/images/chicken-biryani.jpg', isPopular: true, isChefSpecial: true, isAvailable: true, createdAt: '' },
+  { id: 'm2', name: 'Mutton Biryani', description: 'Succulent mutton pieces cooked with premium basmati rice', price: 350, category: 'Biryani Specials', image: '/images/mutton-biryani.jpg', isPopular: true, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm3', name: 'Gobi Manchurian', description: 'Crispy cauliflower tossed in flavorful manchurian sauce', price: 180, category: 'Starters', image: '/images/manchurian.jpg', isPopular: true, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm4', name: 'Crispy Veg', description: 'Crunchy vegetable fritters served with tangy dipping sauce', price: 160, category: 'Starters', image: '/images/paneer-butter-masala.jpg', isPopular: false, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm5', name: 'Chicken Manchurian', description: 'Boneless chicken in spicy-sweet manchurian gravy', price: 220, category: 'Indo-Chinese', image: '/images/manchurian.jpg', isPopular: true, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm6', name: 'Fried Rice', description: 'Wok-tossed rice with vegetables and aromatic seasonings', price: 190, category: 'Indo-Chinese', image: '/images/fried-rice.jpg', isPopular: false, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm7', name: 'Noodles', description: 'Stir-fried noodles with fresh vegetables and sauces', price: 180, category: 'Indo-Chinese', image: '/images/noodles.jpg', isPopular: false, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm8', name: 'Paneer Butter Masala', description: 'Rich and creamy paneer in tomato-based gravy', price: 240, category: 'Main Course', image: '/images/paneer-butter-masala.jpg', isPopular: true, isChefSpecial: true, isAvailable: true, createdAt: '' },
+  { id: 'm9', name: 'Butter Naan', description: 'Soft, buttery Indian bread baked in tandoor', price: 40, category: 'Main Course', image: '/images/butter-naan.jpg', isPopular: false, isChefSpecial: false, isAvailable: true, createdAt: '' },
+  { id: 'm10', name: 'Veg Bullet', description: 'Spicy vegetable stuffed roll with signature seasoning', price: 150, category: 'Vegetarian Specials', image: '/images/veg-curry.jpg', isPopular: false, isChefSpecial: false, isAvailable: true, createdAt: '' },
+];
 
 export default function PreOrderPage() {
-  const [items, setItems] = useState<MenuItem[]>([]);
+  const [items, setItems] = useState<MenuItem[]>(fallbackMenu);
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
@@ -20,16 +33,14 @@ export default function PreOrderPage() {
 
   useEffect(() => {
     fetch('/api/menu').then(r => r.json()).then(data => {
-      if (data && data.length > 0) {
-        setItems(data.filter((i: MenuItem) => i.isAvailable));
-        const stored = getCart();
-        if (stored.length > 0) {
-          const mapped: { [key: string]: number } = {};
-          stored.forEach(si => { mapped[si.id] = si.quantity; });
-          setCart(mapped);
-        }
-      }
+      if (data && data.length > 0) setItems(data.filter((i: MenuItem) => i.isAvailable));
     }).catch(() => {});
+    const stored = getCart();
+    if (stored.length > 0) {
+      const mapped: { [key: string]: number } = {};
+      stored.forEach(si => { mapped[si.id] = si.quantity; });
+      setCart(mapped);
+    }
   }, []);
 
   const addToCart = (id: string) => {
@@ -68,7 +79,7 @@ export default function PreOrderPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cartItems.length === 0) return;
+    if (cartItems.length === 0 || !customerName || !customerMobile || !pickupTime) return;
     setLoading(true);
     try {
       await fetch('/api/orders', {
@@ -105,6 +116,9 @@ export default function PreOrderPage() {
           </div>
           <h2 className="text-2xl font-bold mb-3">Order Placed!</h2>
           <p className="text-white/50 mb-6">Your order has been received. We&apos;ll have it ready for pickup at {pickupTime}.</p>
+          <p className="text-sm text-white/30 mb-6">
+            Pay via {paymentMethod === 'upi' ? 'UPI (918912552021@paytm)' : 'Cash on Pickup'} at the counter
+          </p>
           <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 rounded-full gradient-bg text-sm font-semibold">
             Back to Home
           </Link>
@@ -116,23 +130,6 @@ export default function PreOrderPage() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().slice(0, 16);
-
-  if (cartItems.length === 0 && items.length > 0) {
-    return (
-      <div className="min-h-screen bg-[#0B0B0B] pt-24">
-        <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
-            <ShoppingCart size={40} className="text-white/20" />
-          </div>
-          <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-          <p className="text-white/40 mb-6">Add items from our menu to get started</p>
-          <Link href="/menu" className="inline-flex items-center gap-2 px-6 py-3 rounded-full gradient-bg text-sm font-semibold">
-            Browse Menu <ArrowRight size={16} />
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#0B0B0B] pt-24">
@@ -179,7 +176,7 @@ export default function PreOrderPage() {
             </div>
           </div>
 
-          <div>
+          <div className="lg:col-span-1">
             <div className="glass-card rounded-2xl p-6 sticky top-24">
               <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <ShoppingCart size={18} className="text-[#FC8019]" />
@@ -198,7 +195,7 @@ export default function PreOrderPage() {
                   ))}
                   <div className="border-t border-white/10 pt-3 flex items-center justify-between font-bold">
                     <span>Total</span>
-                    <span className="gradient-text">{formatPrice(totalAmount)}</span>
+                    <span className="text-lg gradient-text">{formatPrice(totalAmount)}</span>
                   </div>
                 </div>
               )}
@@ -264,15 +261,15 @@ export default function PreOrderPage() {
                     <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
                       <p className="text-xs text-white/40 mb-1">Pay to UPI ID:</p>
                       <p className="text-sm font-mono text-[#FC8019]">918912552021@paytm</p>
-                      <p className="text-xs text-white/30 mt-2">Pay at pickup counter or share payment screenshot via WhatsApp</p>
+                      <p className="text-xs text-white/30 mt-2">Pay at pickup counter or share screenshot via WhatsApp</p>
                     </div>
                   )}
                 </div>
 
                 <button
                   type="submit"
-                  disabled={cartItems.length === 0 || loading}
-                  className="w-full py-3 rounded-xl gradient-bg text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                  disabled={cartItems.length === 0 || loading || !customerName || !customerMobile || !pickupTime}
+                  className="w-full py-3.5 rounded-xl gradient-bg text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? 'Placing Order...' : `Place Order · ${formatPrice(totalAmount)}`}
                 </button>
